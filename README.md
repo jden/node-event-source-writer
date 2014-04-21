@@ -19,9 +19,9 @@ var source = new EventSourceWriter()
 
 source.pipe(process.stdout)
 
-source.dispatchEvent({type: 'keypress', keyCode: 72})
-source.dispatchEvent({type: 'keypress', keyCode: 73})
-source.dispatchEvent({type: 'keypress', keyCode: 13})
+source.dispatchEvent({event: 'keypress', data: {keyCode: 72}})
+source.dispatchEvent({event: 'keypress', data: {keyCode: 73})
+source.dispatchEvent({event: 'keypress', data:{keyCode: 13})
 source.end()
 ```
 outputs the events serialized as specified in the [Server-Sent Events spec][]
@@ -52,14 +52,13 @@ has ended.
 
 ## Static functions
 
-### `EventSourceWriter.serialize(Object) => String`
+### `EventSourceWriter.serialize(eventName?: String, data?: Object) => String`
 
-If object has a `type` property, it will be serialized as an `event`;
-otherwise, it will be serialized as a `message` event
+Both `eventName` and `data` are optional. In a common case, you'll supply both a string for the name of the event and an object for any event properties.
 
 Example:
 ```js
-EventSourceWriter.serialize({type: 'coffeeready', time: 'now'})
+EventSourceWriter.serialize('coffeeready', {time: 'now'})
 // => 
 // event: coffeeready
 // data: {"time":"now"}

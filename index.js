@@ -24,39 +24,23 @@ Source.prototype.dispatchEvent = function (e) {
   if (typeof e !== 'object') {
     throw new TypeError('e must be an object')
   }
-  this.push(Source.serialize(e))
+  this.push(Source.serialize(e.event, e.data))
 }
 
-Source.serialize = function serialize(e) {
+Source.serialize = function serialize(type, data) {
   var str = ''
-  if (typeof e.type === 'string') {
-    str += 'event: ' + e.type
-  }
-  
-  var hasData = false
-  for (var prop in e) {
-    if (prop !== 'type') {
-      hasData = true
-      break
-    }
+  if (type !== null && type !== undefined) {
+    str += 'event: ' + type
   }
 
-  if (hasData) {
+  if (typeof data === 'object') {
     // remove the `type` property from the serialized JSON
     var removed = false
     try {
-      str +='\ndata: ' + JSON.stringify(e, function (key, val) {
-        if (e.type && !removed && key === 'type') {
-          removed = true;
-          return
-        }
-        return val
-      })
-      
+      str +='\ndata: ' + JSON.stringify(data)
       // readable mode, but uses more bytes
       // str += JSON.stringify(e, null, 2).split('\n').map(function(line) { return '\ndata: ' + line }).join('')
     } catch (e) { /* unable to serialize event data */ }  
-
 
   }
 

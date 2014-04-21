@@ -17,24 +17,21 @@ describe('event-source-writer', function () {
       data += e
     })
     source.on('end', function () {
-      data.indexOf('event: foo')
+      data.indexOf('event: foo\ndata: {"bar":1}\n\n')
         .should.be.greaterThan(0)
+
       done()
     })
 
-    source.dispatchEvent({type: 'foo'})
+    source.dispatchEvent({event:'foo', data:{bar:1}})
     source.end()
   })
 })
 
 describe('serialize', function () {
   it('serializes an event object', function () {
-    var event = {
-      type: 'close',
-      target: 'window'
-    }
 
-    EventSourceWriter.serialize(event)
+    EventSourceWriter.serialize('close', {target: 'window'})
       .should.equal(
         'event: close\n'
        +'data: {"target":"window"}\n'
@@ -42,8 +39,12 @@ describe('serialize', function () {
       )
   })
   it('data is optional', function() {
-    EventSourceWriter.serialize({type: 'close'})
+    EventSourceWriter.serialize('close')
       .should.equal('event: close\n\n')
+  })
+  it('type can be specified separately', function () {
+    EventSourceWriter.serialize('add', {type: 'feature', id: 12})
+      .should.equal('event: add\ndata: {"type":"feature","id":12}\n\n')
   })
 })
 
